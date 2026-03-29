@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ME War Commodity Tracker</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -12,6 +13,7 @@
   .header { background:#1d3557; padding:18px 30px; border-bottom:4px solid #e63946; }
   .header-inner { max-width:1200px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
   .header h1 { font-size:22px; color:#edf2f4; letter-spacing:-0.5px; }
+  .header-icon { display:inline-block; vertical-align:middle; margin-right:2px; }
   .header .tag { background:#e63946; color:#fff; padding:3px 10px; font-size:11px; font-weight:bold; letter-spacing:1px; text-transform:uppercase; display:inline-block; }
   .header .war-day { background:#e63946; color:#fff; padding:3px 12px; font-size:13px; font-weight:bold; }
   .header .live-indicator { display:flex; align-items:center; gap:6px; color:#a8dadc; font-size:12px; }
@@ -99,7 +101,7 @@
       <span class="war-day" id="war-day">Day 29</span>
       <span style="color:#a8dadc;font-size:12px;margin-left:4px;">2026 Iran Conflict</span>
     </div>
-    <h1>&#128308; Commodity Price Tracker</h1>
+    <h1><span class="header-icon"><img src="crosshair.svg" alt="" width="22" height="22"></span> Commodity Price Tracker</h1>
     <div class="live-indicator">
       <span class="dot"></span> Auto-refresh 5 min
     </div>
