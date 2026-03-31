@@ -464,36 +464,28 @@ async function updatePrices() {
   const live = await fetchLiveData();
   if (!live.brent && !live.wti) return;
   
-  if (live.brent) { CUR.brent = live.brent.price; PREWAR.brent = 72; }
-  if (live.wti) { CUR.wti = live.wti.price; PREWAR.wti = 68; }
-  if (live.natural_gas) { CUR.henryHub = live.natural_gas.price; PREWAR.henryHub = 2.8; }
-  if (live.gasoline) { CUR.jetFuel = live.gasoline.price; PREWAR.jetFuel = 2.41; }
+  if (live.brent) { CUR.brent = live.brent.price; }
+  if (live.wti) { CUR.wti = live.wti.price; }
+  if (live.natural_gas) { CUR.henryHub = live.natural_gas.price; }
+  if (live.gasoline) { CUR.jetFuel = live.gasoline.price; }
+  if (live.ttf) { CUR.ttf = live.ttf.price; }
+  if (live.gold) { CUR.gold = live.gold.price; }
+  if (live.silver) { CUR.silver = live.silver.price; }
+  if (live.jet_fuel) { CUR.jetFuel = live.jet_fuel.price; }
+  if (live.diesel) { CUR.gasUs = live.diesel.price; }
   
   renderCards();
   
   // Update oil table
   const oilRows = document.querySelectorAll('#tab-oil table tr');
-  if (oilRows[1]) {
-    oilRows[1].cells[1].textContent = '$' + PREWAR.brent.toFixed(2);
-    oilRows[1].cells[2].textContent = '$' + CUR.brent.toFixed(2);
-    oilRows[1].cells[2].className = 'up';
-    oilRows[1].cells[3].textContent = '+' + pct(CUR.brent, PREWAR.brent) + '%';
-    oilRows[1].cells[3].className = 'up';
-  }
-  if (oilRows[2]) {
-    oilRows[2].cells[1].textContent = '$' + PREWAR.wti.toFixed(2);
-    oilRows[2].cells[2].textContent = '$' + CUR.wti.toFixed(2);
-    oilRows[2].cells[2].className = 'up';
-    oilRows[2].cells[3].textContent = '+' + pct(CUR.wti, PREWAR.wti) + '%';
-    oilRows[2].cells[3].className = 'up';
-  }
-  if (oilRows[5]) {
-    oilRows[5].cells[1].textContent = '$' + PREWAR.henryHub.toFixed(2);
-    oilRows[5].cells[2].textContent = '$' + CUR.henryHub.toFixed(3);
-    oilRows[5].cells[2].className = CUR.henryHub > PREWAR.henryHub ? 'up' : 'down';
-    oilRows[5].cells[3].textContent = (CUR.henryHub > PREWAR.henryHub ? '+' : '') + pct(CUR.henryHub, PREWAR.henryHub) + '%';
-    oilRows[5].cells[3].className = CUR.henryHub > PREWAR.henryHub ? 'up' : 'down';
-  }
+  if (oilRows[1]) { oilRows[1].cells[2].textContent = '$' + CUR.brent.toFixed(2); oilRows[1].cells[2].className = 'up'; oilRows[1].cells[3].textContent = '+' + pct(CUR.brent, PREWAR.brent) + '%'; oilRows[1].cells[3].className = 'up'; }
+  if (oilRows[2]) { oilRows[2].cells[2].textContent = '$' + CUR.wti.toFixed(2); oilRows[2].cells[2].className = 'up'; oilRows[2].cells[3].textContent = '+' + pct(CUR.wti, PREWAR.wti) + '%'; oilRows[2].cells[3].className = 'up'; }
+  if (oilRows[4]) { oilRows[4].cells[2].textContent = '\u20ac' + CUR.ttf.toFixed(2); oilRows[4].cells[2].className = 'up'; oilRows[4].cells[3].textContent = '+' + pct(CUR.ttf, PREWAR.ttf) + '%'; oilRows[4].cells[3].className = 'up'; }
+  if (oilRows[5]) { oilRows[5].cells[2].textContent = '$' + CUR.henryHub.toFixed(3); oilRows[5].cells[2].className = CUR.henryHub > PREWAR.henryHub ? 'up' : 'down'; oilRows[5].cells[3].textContent = (CUR.henryHub > PREWAR.henryHub ? '+' : '') + pct(CUR.henryHub, PREWAR.henryHub) + '%'; }
+  
+  // Update metals table
+  const metalRows = document.querySelectorAll('#tab-metals table tr');
+  if (metalRows[1]) { metalRows[1].cells[2].textContent = '$' + CUR.gold.toLocaleString() + '/oz'; metalRows[1].cells[3].textContent = '+' + pct(CUR.gold, PREWAR.gold) + '%'; }
   
   // Update last update time
   const timestamps = Object.values(live).map(v => v?.updated).filter(Boolean).sort().reverse();
