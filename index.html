@@ -314,12 +314,12 @@ document.getElementById('war-day').textContent = 'Day ' + WAR_DAY;
 const PREWAR = {
   brent:72, wti:68, dubai:75, ttf:38, henryHub:2.8, asianLNG:14,
   jetFuel:2.41, gasUs:3.10, gold:4400, aluminum:3000, copper:5.20,
-  ureaEgypt:445, ureaUS:600, ammonia:750, potash:420
+  ureaEgypt:445, ureaUS:600, ammonia:750, potash:420, silver:60
 };
 const CUR = {
   brent:112.57, wti:99.64, dubai:126, ttf:54.52, henryHub:3.035, asianLNG:21,
   jetFuel:5.00, gasUs:3.93, gold:4493, aluminum:3284.50, copper:5.558,
-  ureaEgypt:700, ureaUS:674, ammonia:998, potash:487
+  ureaEgypt:700, ureaUS:674, ammonia:998, potash:487, silver:75.13
 };
 
 function pct(c,p) { return ((c-p)/p*100).toFixed(1); }
@@ -350,9 +350,7 @@ function renderCards() {
 }
 renderCards();
 
-// Chart palette
-const RED = '#e63946'; const BLUE = '#457b9d'; const TEAL = '#06d6a0';
-const YELLOW = '#f4a261'; const DARK = '#1d3557'; const GRAY = '#8d99ae';
+// Chart options
 const chartOpts = {
   responsive:true, maintainAspectRatio:false,
   plugins:{ legend:{ labels:{ color:DARK, font:{size:11,weight:'bold'}, padding:14 } } },
@@ -361,79 +359,6 @@ const chartOpts = {
     y:{ ticks:{color:GRAY, font:{size:10}}, grid:{color:'#e9ecef'} }
   }
 };
-
-// Overview bar
-new Chart(document.getElementById('changeChart'), {
-  type:'bar',
-  data:{ labels:['Brent','WTI','Dubai','TTF','Jet Fuel','Urea(EG)','Gold','Aluminum','Copper','Ammonia'],
-    datasets:[{ data:[pct(CUR.brent,PREWAR.brent),pct(CUR.wti,PREWAR.wti),pct(CUR.dubai,PREWAR.dubai),pct(CUR.ttf,PREWAR.ttf),pct(CUR.jetFuel,PREWAR.jetFuel),pct(CUR.ureaEgypt,PREWAR.ureaEgypt),pct(CUR.gold,PREWAR.gold),pct(CUR.aluminum,PREWAR.aluminum),pct(CUR.copper,PREWAR.copper),pct(CUR.ammonia,PREWAR.ammonia)],
-      backgroundColor:[RED,RED,RED,YELLOW,RED,RED,TEAL,BLUE,BLUE,YELLOW], borderWidth:0 }]
-  },
-  options:{ ...chartOpts, plugins:{ ...chartOpts.plugins, legend:{display:false} },
-    scales:{ ...chartOpts.scales, y:{...chartOpts.scales.y, ticks:{...chartOpts.scales.y.ticks, callback:v=>v+'%'}} }
-  }
-});
-
-// Oil chart
-new Chart(document.getElementById('oilChart'), {
-  type:'line',
-  data:{ labels:['Feb 28','Mar 1','Mar 5','Mar 10','Mar 15','Mar 20','Mar 22','Mar 24','Mar 26','Mar 28','Mar 29'],
-    datasets:[
-      { label:'Brent', data:[72,78,83,95,105,112,112,99,108,112.57,112.57], borderColor:RED, backgroundColor:'rgba(230,57,70,0.08)', fill:true, tension:0.25, borderWidth:2, pointRadius:3 },
-      { label:'WTI', data:[68,73,78,88,95,99,99,86,95,99.64,99.64], borderColor:BLUE, backgroundColor:'rgba(69,123,157,0.08)', fill:true, tension:0.25, borderWidth:2, pointRadius:3 }
-    ]
-  },
-  options:{ ...chartOpts, scales:{ ...chartOpts.scales, y:{...chartOpts.scales.y, ticks:{...chartOpts.scales.y.ticks, callback:v=>'$'+v}} } }
-});
-
-// Gas chart
-new Chart(document.getElementById('gasChart'), {
-  type:'line',
-  data:{ labels:['Feb 28','Mar 1','Mar 5','Mar 10','Mar 15','Mar 20','Mar 25','Mar 29'],
-    datasets:[
-      { label:'TTF (EUR/MWh)', data:[38,40,42,45,48,50,52,54.52], borderColor:YELLOW, tension:0.25, borderWidth:2, pointRadius:3 },
-      { label:'Henry Hub ($/MMBtu)', data:[2.8,2.85,2.9,2.95,3.0,3.01,3.02,3.035], borderColor:TEAL, tension:0.25, borderWidth:2, pointRadius:3 }
-    ]
-  },
-  options:{ ...chartOpts, scales:{ ...chartOpts.scales, y:{...chartOpts.scales.y, ticks:{...chartOpts.scales.y.ticks, callback:v=>v}} } }
-});
-
-// Fuel chart
-new Chart(document.getElementById('fuelChart'), {
-  type:'bar',
-  data:{ labels:['Jet Fuel','Gasoline'],
-    datasets:[
-      { label:'Pre-War', data:[2.41,3.10], backgroundColor:'rgba(141,153,174,0.5)', borderWidth:0 },
-      { label:'Current', data:[5.00,3.93], backgroundColor:RED, borderWidth:0 }
-    ]
-  },
-  options:{ ...chartOpts, scales:{ ...chartOpts.scales, y:{...chartOpts.scales.y, ticks:{...chartOpts.scales.y.ticks, callback:v=>'$'+v+' /gal'}} } }
-});
-
-// Metals chart
-new Chart(document.getElementById('metalsChart'), {
-  type:'line',
-  data:{ labels:['Feb 28','Mar 1','Mar 5','Mar 10','Mar 15','Mar 20','Mar 25','Mar 29'],
-    datasets:[
-      { label:'Gold ($/oz, \u00f710)', data:[440,442,445,448,450,452,448,449.3], borderColor:YELLOW, tension:0.25, borderWidth:2, pointRadius:3 },
-      { label:'Aluminum ($/mt, \u00f710)', data:[300,305,310,315,320,325,327,328.45], borderColor:GRAY, tension:0.25, borderWidth:2, pointRadius:3 },
-      { label:'Copper ($/lb, \u00d7100)', data:[520,525,530,540,545,550,555,555.8], borderColor:BLUE, tension:0.25, borderWidth:2, pointRadius:3 }
-    ]
-  },
-  options:{ ...chartOpts, scales:{ ...chartOpts.scales, y:{...chartOpts.scales.y, ticks:{...chartOpts.scales.y.ticks, callback:v=>v}} } }
-});
-
-// Agriculture chart
-new Chart(document.getElementById('agriChart'), {
-  type:'bar',
-  data:{ labels:['Urea (Egypt FOB)','Urea (US Retail)','Anhydrous Ammonia','UAN 28%','Potash'],
-    datasets:[
-      { label:'Pre-War ($/ton)', data:[445,600,750,400,420], backgroundColor:GRAY, borderWidth:0 },
-      { label:'Current ($/ton)', data:[700,674,998,464,487], backgroundColor:RED, borderWidth:0 }
-    ]
-  },
-  options:{ ...chartOpts, scales:{ ...chartOpts.scales, y:{...chartOpts.scales.y, ticks:{...chartOpts.scales.y.ticks, callback:v=>'$'+v}} } }
-});
 
 // Tabs
 function switchTab(name, el) {
@@ -485,7 +410,10 @@ async function updatePrices() {
   
   // Update metals table
   const metalRows = document.querySelectorAll('#tab-metals table tr');
-  if (metalRows[1]) { metalRows[1].cells[2].textContent = '$' + CUR.gold.toLocaleString() + '/oz'; metalRows[1].cells[3].textContent = '+' + pct(CUR.gold, PREWAR.gold) + '%'; }
+  if (metalRows[1]) { metalRows[1].cells[2].textContent = '$' + CUR.gold.toLocaleString() + '/oz'; metalRows[1].cells[2].className = 'up'; metalRows[1].cells[3].textContent = '+' + pct(CUR.gold, PREWAR.gold) + '%'; metalRows[1].cells[3].className = 'up'; }
+  
+  // Update charts with live data
+  updateCharts();
   
   // Update last update time
   const timestamps = Object.values(live).map(v => v?.updated).filter(Boolean).sort().reverse();
@@ -495,6 +423,105 @@ async function updatePrices() {
   }
 }
 
+// Chart references for dynamic updates
+let changeChartInstance = null;
+let oilChartInstance = null;
+
+// Store original chart creation functions
+const origChangeChart = document.getElementById('changeChart');
+
+// Create charts function (called once on load)
+function createCharts() {
+  // Overview bar chart
+  changeChartInstance = new Chart(document.getElementById('changeChart'), {
+    type:'bar',
+    data:{ labels:['Brent','WTI','Dubai','TTF','Jet Fuel','Urea(EG)','Gold','Silver','Aluminum','Copper','Ammonia'],
+      datasets:[{ data:[pct(CUR.brent,PREWAR.brent),pct(CUR.wti,PREWAR.wti),pct(CUR.dubai,PREWAR.dubai),pct(CUR.ttf,PREWAR.ttf),pct(CUR.jetFuel,PREWAR.jetFuel),pct(CUR.ureaEgypt,PREWAR.ureaEgypt),pct(CUR.gold,PREWAR.gold),pct(CUR.silver||75.13,PREWAR.silver||60),pct(CUR.aluminum,PREWAR.aluminum),pct(CUR.copper,PREWAR.copper),pct(CUR.ammonia,PREWAR.ammonia)],
+        backgroundColor:[RED,RED,RED,YELLOW,RED,RED,TEAL,'#457b9d',BLUE,BLUE,YELLOW], borderWidth:0 }]
+    },
+    options:{ ...chartOpts, plugins:{ ...chartOpts.plugins, legend:{display:false} },
+      scales:{ ...chartOpts.scales, y:{...chartOpts.scales.y, ticks:{...chartOpts.scales.y.ticks, callback:v=>v+'%'}} }
+    }
+  });
+  
+  // Oil price chart
+  oilChartInstance = new Chart(document.getElementById('oilChart'), {
+    type:'line',
+    data:{ labels:['Feb 28','Mar 1','Mar 5','Mar 10','Mar 15','Mar 20','Mar 22','Mar 24','Mar 26','Mar 28','Mar 31 (Live)'],
+      datasets:[
+        { label:'Brent', data:[72,78,83,95,105,112,112,99,108,112.57,CUR.brent], borderColor:RED, backgroundColor:'rgba(230,57,70,0.08)', fill:true, tension:0.25, borderWidth:2, pointRadius:3 },
+        { label:'WTI', data:[68,73,78,88,95,99,99,86,95,99.64,CUR.wti], borderColor:BLUE, backgroundColor:'rgba(69,123,157,0.08)', fill:true, tension:0.25, borderWidth:2, pointRadius:3 }
+      ]
+    },
+    options:{ ...chartOpts, scales:{ ...chartOpts.scales, y:{...chartOpts.scales.y, ticks:{...chartOpts.scales.y.ticks, callback:v=>'$'+v}} } }
+  });
+  
+  // Gas chart
+  new Chart(document.getElementById('gasChart'), {
+    type:'line',
+    data:{ labels:['Feb 28','Mar 1','Mar 5','Mar 10','Mar 15','Mar 20','Mar 25','Mar 31 (Live)'],
+      datasets:[
+        { label:'TTF (EUR/MWh)', data:[38,40,42,45,48,50,52,CUR.ttf], borderColor:YELLOW, tension:0.25, borderWidth:2, pointRadius:3 },
+        { label:'Henry Hub ($/MMBtu)', data:[2.8,2.85,2.9,2.95,3.0,3.01,3.02,CUR.henryHub], borderColor:TEAL, tension:0.25, borderWidth:2, pointRadius:3 }
+      ]
+    },
+    options:{ ...chartOpts, scales:{ ...chartOpts.scales, y:{...chartOpts.scales.y, ticks:{...chartOpts.scales.y.ticks, callback:v=>v}} } }
+  });
+  
+  // Fuel chart
+  new Chart(document.getElementById('fuelChart'), {
+    type:'bar',
+    data:{ labels:['Jet Fuel','Gasoline'],
+      datasets:[
+        { label:'Pre-War', data:[PREWAR.jetFuel, PREWAR.gasUs], backgroundColor:'rgba(141,153,174,0.5)', borderWidth:0 },
+        { label:'Current', data:[CUR.jetFuel, CUR.gasUs], backgroundColor:RED, borderWidth:0 }
+      ]
+    },
+    options:{ ...chartOpts, scales:{ ...chartOpts.scales, y:{...chartOpts.scales.y, ticks:{...chartOpts.scales.y.ticks, callback:v=>'$'+v+' /gal'}} } }
+  });
+  
+  // Metals chart
+  new Chart(document.getElementById('metalsChart'), {
+    type:'line',
+    data:{ labels:['Feb 28','Mar 1','Mar 5','Mar 10','Mar 15','Mar 20','Mar 25','Mar 31 (Live)'],
+      datasets:[
+        { label:'Gold ($/oz, \u00f710)', data:[440,442,445,448,450,452,448,CUR.gold/10], borderColor:YELLOW, tension:0.25, borderWidth:2, pointRadius:3 },
+        { label:'Silver ($/oz, \u00f75)', data:[520/10,525/10,530/10,540/10,545/10,550/10,555/10,(CUR.silver||75.13)/5], borderColor:'#c0c0c0', tension:0.25, borderWidth:2, pointRadius:3 },
+        { label:'Copper ($/lb, \u00d7100)', data:[520,525,530,540,545,550,555,555.8], borderColor:BLUE, tension:0.25, borderWidth:2, pointRadius:3 }
+      ]
+    },
+    options:{ ...chartOpts, scales:{ ...chartOpts.scales, y:{...chartOpts.scales.y, ticks:{...chartOpts.scales.y.ticks, callback:v=>v}} } }
+  });
+  
+  // Agriculture chart
+  new Chart(document.getElementById('agriChart'), {
+    type:'bar',
+    data:{ labels:['Urea (Egypt FOB)','Urea (US Retail)','Anhydrous Ammonia','UAN 28%','Potash'],
+      datasets:[
+        { label:'Pre-War ($/ton)', data:[445,600,750,400,420], backgroundColor:GRAY, borderWidth:0 },
+        { label:'Current ($/ton)', data:[700,674,998,464,487], backgroundColor:RED, borderWidth:0 }
+      ]
+    },
+    options:{ ...chartOpts, scales:{ ...chartOpts.scales, y:{...chartOpts.scales.y, ticks:{...chartOpts.scales.y.ticks, callback:v=>'$'+v}} } }
+  });
+}
+
+// Update charts with live data
+function updateCharts() {
+  if (changeChartInstance) {
+    const newData = [pct(CUR.brent,PREWAR.brent),pct(CUR.wti,PREWAR.wti),pct(CUR.dubai,PREWAR.dubai),pct(CUR.ttf,PREWAR.ttf),pct(CUR.jetFuel,PREWAR.jetFuel),pct(CUR.ureaEgypt,PREWAR.ureaEgypt),pct(CUR.gold,PREWAR.gold),pct(CUR.silver||75.13,PREWAR.silver||60),pct(CUR.aluminum,PREWAR.aluminum),pct(CUR.copper,PREWAR.copper),pct(CUR.ammonia,PREWAR.ammonia)];
+    changeChartInstance.data.datasets[0].data = newData;
+    changeChartInstance.update('none');
+  }
+  if (oilChartInstance) {
+    oilChartInstance.data.datasets[0].data[10] = CUR.brent;
+    oilChartInstance.data.datasets[1].data[10] = CUR.wti;
+    oilChartInstance.update('none');
+  }
+}
+
+// Initialize charts on load
+createCharts();
 // Fetch live data on load
 updatePrices();
 
