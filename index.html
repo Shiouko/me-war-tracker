@@ -446,41 +446,29 @@ function switchTab(name, el) {
 // Footer date
 document.getElementById('footer-date').textContent = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
 
-// Live data fetch from oilpriceapi
-const API_KEY = '026213ae456861e1cd9741ab86999ee48a0a16e78e16fdc2a051122147b46152';
-const API_BASE = 'https://api.oilpriceapi.com/v1/prices/latest';
+// Live data fetch via serverless proxy (API key hidden server-side)
+const API_BASE = '/.netlify/functions/oil-prices';
 
 async function fetchLiveData() {
-  const codes = { brent:'BRENT_CRUDE_USD', wti:'WTI_CRUDE_USD', gas:'NATURAL_GAS_USD', gasoline:'GASOLINE_USD' };
-  const results = {};
-  for (const [key, code] of Object.entries(codes)) {
-    try {
-      const res = await fetch(`${API_BASE}?code=${code}`, { headers: { 'Authorization': `Token ${API_KEY}` } });
-      const data = await res.json();
-      if (data.status === 'success') {
-        results[key] = {
-          price: data.data.price,
-          change24h: data.data.changes?.['24h']?.percent || 0,
-          updated: data.data.updated_at
-        };
-      }
-    } catch (e) {
-      console.warn(`Failed to fetch ${code}:`, e);
-    }
+  try {
+    const res = await fetch(API_BASE);
+    const data = await res.json();
+    return data;
+  } catch (e) {
+    console.warn('Failed to fetch live data:', e);
+    return {};
   }
-  return results;
 }
 
 async function updatePrices() {
   const live = await fetchLiveData();
-  if (!live.brent && !live.wti) return; // API failed, keep static data
+  if (!live.brent && !live.wti) return;
   
-  CUR.brent = live.brent?.price || CUR.brent;
-  CUR.wti = live.wti?.price || CUR.wti;
-  CUR.henryHub = live.gas?.price || CUR.henryHub;
-  CUR.jetFuel = live.gasoline?.price || CUR.jetFuel;
+  if (live.brent) { CUR.brent = live.brent.price; PREWAR.brent = 72; }
+  if (live.wti) { CUR.wti = live.wti.price; PREWAR.wti = 68; }
+  if (live.natural_gas) { CUR.henryHub = live.natural_gas.price; PREWAR.henryHub = 2.8; }
+  if (live.gasoline) { CUR.jetFuel = live.gasoline.price; PREWAR.jetFuel = 2.41; }
   
-  // Re-render cards
   renderCards();
   
   // Update oil table
