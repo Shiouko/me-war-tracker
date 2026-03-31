@@ -349,6 +349,10 @@ function renderCards() {
 }
 renderCards();
 
+// Chart colors
+const RED = '#e63946'; const BLUE = '#457b9d'; const TEAL = '#06d6a0';
+const YELLOW = '#f4a261'; const DARK = '#1d3557'; const GRAY = '#8d99ae';
+
 // Chart options
 const chartOpts = {
   responsive:true, maintainAspectRatio:false,
@@ -375,11 +379,16 @@ const API_BASE = '/oil-prices';
 
 async function fetchLiveData() {
   try {
-    const res = await fetch(API_BASE);
+    const res = await fetch(API_BASE, { 
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) { console.warn('API response not OK:', res.status); return {}; }
     const data = await res.json();
+    console.log('Live data received:', data);
     return data;
   } catch (e) {
-    console.warn('Failed to fetch live data:', e);
+    console.warn('Failed to fetch live data:', e.message);
     return {};
   }
 }
@@ -519,10 +528,17 @@ function updateCharts() {
   }
 }
 
-// Initialize charts on load
-createCharts();
-// Fetch live data on load
-updatePrices();
+// Safe init
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', safeInit);
+} else {
+  safeInit();
+}
+
+function safeInit() {
+  try { createCharts(); } catch(e) { console.error('Chart error:', e); }
+  try { updatePrices(); } catch(e) { console.error('API error:', e); }
+}
 
 // Auto-refresh with countdown
 let refreshCountdown = 5 * 60;
