@@ -446,19 +446,94 @@ function switchTab(name, el) {
 // Footer date
 document.getElementById('footer-date').textContent = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
 
+// Live data fetch from oilpriceapi
+const API_KEY = '026213ae456861e1cd9741ab86999ee48a0a16e78e16fdc2a051122147b46152';
+const API_BASE = 'https://api.oilpriceapi.com/v1/prices/latest';
+
+async function fetchLiveData() {
+  const codes = { brent:'BRENT_CRUDE_USD', wti:'WTI_CRUDE_USD', gas:'NATURAL_GAS_USD', gasoline:'GASOLINE_USD' };
+  const results = {};
+  for (const [key, code] of Object.entries(codes)) {
+    try {
+      const res = await fetch(`${API_BASE}?code=${code}`, { headers: { 'Authorization': `Token ${API_KEY}` } });
+      const data = await res.json();
+      if (data.status === 'success') {
+        results[key] = {
+          price: data.data.price,
+          change24h: data.data.changes?.['24h']?.percent || 0,
+          updated: data.data.updated_at
+        };
+      }
+    } catch (e) {
+      console.warn(`Failed to fetch ${code}:`, e);
+    }
+  }
+  return results;
+}
+
+async function updatePrices() {
+  const live = await fetchLiveData();
+  if (!live.brent && !live.wti) return; // API failed, keep static data
+  
+  CUR.brent = live.brent?.price || CUR.brent;
+  CUR.wti = live.wti?.price || CUR.wti;
+  CUR.henryHub = live.gas?.price || CUR.henryHub;
+  CUR.jetFuel = live.gasoline?.price || CUR.jetFuel;
+  
+  // Re-render cards
+  renderCards();
+  
+  // Update oil table
+  const oilRows = document.querySelectorAll('#tab-oil table tr');
+  if (oilRows[1]) {
+    oilRows[1].cells[1].textContent = '$' + PREWAR.brent.toFixed(2);
+    oilRows[1].cells[2].textContent = '$' + CUR.brent.toFixed(2);
+    oilRows[1].cells[2].className = 'up';
+    oilRows[1].cells[3].textContent = '+' + pct(CUR.brent, PREWAR.brent) + '%';
+    oilRows[1].cells[3].className = 'up';
+  }
+  if (oilRows[2]) {
+    oilRows[2].cells[1].textContent = '$' + PREWAR.wti.toFixed(2);
+    oilRows[2].cells[2].textContent = '$' + CUR.wti.toFixed(2);
+    oilRows[2].cells[2].className = 'up';
+    oilRows[2].cells[3].textContent = '+' + pct(CUR.wti, PREWAR.wti) + '%';
+    oilRows[2].cells[3].className = 'up';
+  }
+  if (oilRows[5]) {
+    oilRows[5].cells[1].textContent = '$' + PREWAR.henryHub.toFixed(2);
+    oilRows[5].cells[2].textContent = '$' + CUR.henryHub.toFixed(3);
+    oilRows[5].cells[2].className = CUR.henryHub > PREWAR.henryHub ? 'up' : 'down';
+    oilRows[5].cells[3].textContent = (CUR.henryHub > PREWAR.henryHub ? '+' : '') + pct(CUR.henryHub, PREWAR.henryHub) + '%';
+    oilRows[5].cells[3].className = CUR.henryHub > PREWAR.henryHub ? 'up' : 'down';
+  }
+  
+  // Update last update time
+  const timestamps = Object.values(live).map(v => v?.updated).filter(Boolean).sort().reverse();
+  if (timestamps[0]) {
+    const d = new Date(timestamps[0]);
+    document.getElementById('refresh-status').textContent = `Live | Updated ${d.toLocaleTimeString()}`;
+  }
+}
+
+// Fetch live data on load
+updatePrices();
+
 // Auto-refresh with countdown
 let refreshCountdown = 5 * 60;
-const refreshInterval = setInterval(() => {
+const refreshInterval = setInterval(async () => {
   refreshCountdown--;
   const min = Math.floor(refreshCountdown / 60);
   const sec = refreshCountdown % 60;
-  document.getElementById('refresh-status').textContent = `Next refresh in ${min}:${sec.toString().padStart(2,'0')}`;
+  if (refreshCountdown > 0) {
+    document.getElementById('refresh-status').textContent = `Next update in ${min}:${sec.toString().padStart(2,'0')}`;
+  }
   if (refreshCountdown <= 10) {
     document.getElementById('status-dot').style.background = '#e63946';
   }
   if (refreshCountdown <= 0) {
-    clearInterval(refreshInterval);
-    window.location.reload();
+    await updatePrices();
+    refreshCountdown = 5 * 60;
+    document.getElementById('status-dot').style.background = '#06d6a0';
   }
 }, 1000);
 
