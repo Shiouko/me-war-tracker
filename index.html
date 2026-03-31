@@ -325,27 +325,26 @@ const CUR = {
 function pct(c,p) { return ((c-p)/p*100).toFixed(1); }
 function pctHtml(c,p) { const v=pct(c,p); return '<span class="up">+'+v+'%</span>'; }
 
-// Price cards
-const specs = [
-  { l:'Brent Crude', p:CUR.brent, pw:PREWAR.brent, u:'$/bbl', accent:true },
-  { l:'WTI Crude', p:CUR.wti, pw:PREWAR.wti, u:'$/bbl' },
-  { l:'Dubai Physical', p:CUR.dubai, pw:PREWAR.dubai, u:'$/bbl' },
-  { l:'Gold', p:CUR.gold, pw:PREWAR.gold, u:'$/oz', type:'teal' },
-  { l:'Jet Fuel', p:CUR.jetFuel, pw:PREWAR.jetFuel, u:'$/gal', accent:true },
-  { l:'TTF Gas', p:CUR.ttf, pw:PREWAR.ttf, u:'EUR/MWh', type:'blue' },
-  { l:'Urea (Egypt)', p:CUR.ureaEgypt, pw:PREWAR.ureaEgypt, u:'$/ton', accent:true },
-  { l:'Aluminum', p:CUR.aluminum, pw:PREWAR.aluminum, u:'$/mt', type:'blue' },
-  { l:'Copper', p:CUR.copper, pw:PREWAR.copper, u:'$/lb', type:'teal' },
-  { l:'Ammonia', p:CUR.ammonia, pw:PREWAR.ammonia, u:'$/ton', accent:true },
-];
-
+// Price cards (dynamic — reads from CUR and PREWAR)
 function renderCards() {
-  document.getElementById('price-cards').innerHTML = specs.map(s => {
+  const dynamicSpecs = [
+    { l:'Brent Crude', p:CUR.brent, pw:PREWAR.brent, u:'$/bbl', accent:true },
+    { l:'WTI Crude', p:CUR.wti, pw:PREWAR.wti, u:'$/bbl' },
+    { l:'Dubai Physical', p:CUR.dubai, pw:PREWAR.dubai, u:'$/bbl' },
+    { l:'Gold', p:CUR.gold, pw:PREWAR.gold, u:'$/oz', type:'teal' },
+    { l:'Jet Fuel', p:CUR.jetFuel, pw:PREWAR.jetFuel, u:'$/gal', accent:true },
+    { l:'TTF Gas', p:CUR.ttf, pw:PREWAR.ttf, u:'EUR/MWh', type:'blue' },
+    { l:'Silver', p:CUR.silver, pw:PREWAR.silver, u:'$/oz', type:'teal' },
+    { l:'Urea (Egypt)', p:CUR.ureaEgypt, pw:PREWAR.ureaEgypt, u:'$/ton', accent:true },
+    { l:'Aluminum', p:CUR.aluminum, pw:PREWAR.aluminum, u:'$/mt', type:'blue' },
+    { l:'Copper', p:CUR.copper, pw:PREWAR.copper, u:'$/lb', type:'teal' },
+    { l:'Ammonia', p:CUR.ammonia, pw:PREWAR.ammonia, u:'$/ton', accent:true },
+  ];
+  document.getElementById('price-cards').innerHTML = dynamicSpecs.map(s => {
     const cls = s.accent ? 'card-accent' : s.type === 'teal' ? 'card-teal' : s.type === 'blue' ? 'card-blue' : 'card';
     const sym = s.u.startsWith('EUR') ? '\u20ac' : '$';
     const v = pct(s.p, s.pw);
-    const changeClass = 'up';
-    return `<div class="${cls}"><div class="label">${s.l}</div><div class="price">${sym}${s.p.toLocaleString()}</div><div class="change ${changeClass}">+${v}%</div><div class="pre-war">Pre-war: $${s.pw} ${s.u}</div></div>`;
+    return `<div class="${cls}"><div class="label">${s.l}</div><div class="price">${sym}${s.p.toLocaleString()}</div><div class="change up">+${v}%</div><div class="pre-war">Pre-war: $${s.pw} ${s.u}</div></div>`;
   }).join('');
 }
 renderCards();
