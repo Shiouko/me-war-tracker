@@ -103,7 +103,8 @@
     </div>
     <h1><span class="header-icon"><img src="crosshair.svg" alt="" width="22" height="22"></span> Commodity Price Tracker</h1>
     <div class="live-indicator">
-      <span class="dot"></span> Auto-refresh 5 min
+      <span class="dot" id="status-dot"></span>
+      <span id="refresh-status">Auto-refresh 5 min</span>
     </div>
   </div>
 </div>
@@ -300,7 +301,7 @@
 </div>
 
 <div class="footer">
-  Ruby Research Bot &bull; Sources: Reuters, CNBC, oilpriceapi.com, LME, COMEX, USDA &bull; March 29, 2026 &bull;
+  Ruby Research Bot &bull; Sources: Reuters, CNBC, oilpriceapi.com, LME, COMEX, USDA &bull; <span id="footer-date"></span> &bull;
   <a href="https://github.com/Shiouko/me-war-tracker">GitHub</a> &bull; Not financial advice
 </div>
 
@@ -338,13 +339,16 @@ const specs = [
   { l:'Ammonia', p:CUR.ammonia, pw:PREWAR.ammonia, u:'$/ton', accent:true },
 ];
 
-document.getElementById('price-cards').innerHTML = specs.map(s => {
-  const cls = s.accent ? 'card-accent' : s.type === 'teal' ? 'card-teal' : s.type === 'blue' ? 'card-blue' : 'card';
-  const sym = s.u.startsWith('EUR') ? '\u20ac' : '$';
-  const v = pct(s.p, s.pw);
-  const changeCls = s.accent || s.type === 'teal' || s.type === 'blue' ? '' : ' up';
-  return `<div class="${cls}"><div class="label">${s.l}</div><div class="price">${sym}${s.p.toLocaleString()}</div><div class="change"${changeCls ? ' class="'+changeCls+'"' : ''}>+${v}%</div><div class="pre-war">Pre-war: $${s.pw} ${s.u}</div></div>`;
-}).join('');
+function renderCards() {
+  document.getElementById('price-cards').innerHTML = specs.map(s => {
+    const cls = s.accent ? 'card-accent' : s.type === 'teal' ? 'card-teal' : s.type === 'blue' ? 'card-blue' : 'card';
+    const sym = s.u.startsWith('EUR') ? '\u20ac' : '$';
+    const v = pct(s.p, s.pw);
+    const changeClass = 'up';
+    return `<div class="${cls}"><div class="label">${s.l}</div><div class="price">${sym}${s.p.toLocaleString()}</div><div class="change ${changeClass}">+${v}%</div><div class="pre-war">Pre-war: $${s.pw} ${s.u}</div></div>`;
+  }).join('');
+}
+renderCards();
 
 // Chart palette
 const RED = '#e63946'; const BLUE = '#457b9d'; const TEAL = '#06d6a0';
@@ -438,6 +442,26 @@ function switchTab(name, el) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
 }
+
+// Footer date
+document.getElementById('footer-date').textContent = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+
+// Auto-refresh with countdown
+let refreshCountdown = 5 * 60;
+const refreshInterval = setInterval(() => {
+  refreshCountdown--;
+  const min = Math.floor(refreshCountdown / 60);
+  const sec = refreshCountdown % 60;
+  document.getElementById('refresh-status').textContent = `Next refresh in ${min}:${sec.toString().padStart(2,'0')}`;
+  if (refreshCountdown <= 10) {
+    document.getElementById('status-dot').style.background = '#e63946';
+  }
+  if (refreshCountdown <= 0) {
+    clearInterval(refreshInterval);
+    window.location.reload();
+  }
+}, 1000);
+
 </script>
 </body>
 </html>
