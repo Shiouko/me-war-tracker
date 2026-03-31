@@ -447,7 +447,7 @@ function switchTab(name, el) {
 document.getElementById('footer-date').textContent = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
 
 // Live data fetch via serverless proxy (API key hidden server-side)
-const API_BASE = '/.netlify/functions/oil-prices';
+const API_BASE = '/oil-prices';
 
 async function fetchLiveData() {
   try {
